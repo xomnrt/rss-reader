@@ -1,8 +1,6 @@
 import '../scss/styles.scss'
-import _ from 'lodash';
 
 import * as bootstrap from 'bootstrap';
-import * as yup from 'yup';
 
 // import {formValidation, validate} from './validation.js';
 
