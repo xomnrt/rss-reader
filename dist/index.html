@@ -1,28 +1,32 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="./main.css">
-    <title>RSS feed</title>
-  </head>
-  <body>
-    <main class="flex-grow-1">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="./main.css">
+  <title>RSS feed</title>
+</head>
+
+<body>
+  <main class="flex-grow-1">
     <section class="container-fluid bg-dark p-5">
       <div class="row">
         <div class="col-md-10 col-lg-8 mx-auto ">
-          <h1 class="display-3 mb-0 text-info" >RSS агрегатор</h1>
-          <p class="lead text-white" >Начните читать RSS сегодня! Это легко, это красиво.</p>
+          <h1 class="display-3 mb-0 text-info">RSS агрегатор</h1>
+          <p class="lead text-white">Начните читать RSS сегодня! Это легко, это красиво.</p>
           <form action class="rss-form text-body">
             <div class="row">
               <div class="col">
                 <div class="form-floating">
-                  <input id="url-input" autofocus required name="url" aria-label="url" class="form-control w-100" placeholder="ссылка RSS" autocomplete="off">
+                  <input id="url-input" autofocus required name="url" aria-label="url" class="form-control w-100"
+                    placeholder="ссылка RSS" autocomplete="off">
                   <label for="url-input">Ссылка RSS</label>
                 </div>
               </div>
               <div class="col-auto">
-                <button type="submit" aria-label="add" class="h-100 btn btn-lg btn-info px-sm-5 text-white">Добавить</button>
+                <button type="submit" aria-label="add"
+                  class="h-100 btn btn-lg btn-info px-sm-5 text-white">Добавить</button>
               </div>
             </div>
           </form>
@@ -51,14 +55,15 @@
         </div>
       </div>
     </section>
-    </main>
-    <footer class="footer border-top py-3 mt-5 bg-light">
-      <div class="container-xl">
-        <div class="text-center">created by
-          <a href="https://github.com/xomnrt" target="_blank" class="text-info">Ekaterina Fomina</a>
-        </div>
+  </main>
+  <footer class="footer border-top py-3 mt-5 bg-light">
+    <div class="container-xl">
+      <div class="text-center">created by
+        <a href="https://github.com/xomnrt" target="_blank" class="text-info">Ekaterina Fomina</a>
       </div>
-    </footer>
-    <script src="./main.js"></script>
-  </body>
+    </div>
+  </footer>
+  <script src="./main.js"></script>
+</body>
+
 </html>

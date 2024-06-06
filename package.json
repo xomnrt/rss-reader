@@ -10,11 +10,15 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@babel/core": "^7.24.6",
+    "@babel/eslint-parser": "^7.24.6",
     "autoprefixer": "^10.4.19",
     "css-loader": "^7.1.1",
     "eslint": "^8.57.0",
     "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-babel": "^5.3.1",
     "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jest": "^28.5.0",
     "mini-css-extract-plugin": "^2.9.0",
     "postcss-loader": "^8.1.1",
     "sass": "^1.76.0",
@@ -26,6 +30,9 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
-    "bootstrap": "^5.3.3"
+    "axios": "^1.7.2",
+    "bootstrap": "^5.3.3",
+    "lodash": "^4.17.21",
+    "yup": "^1.4.0"
   }
 }
