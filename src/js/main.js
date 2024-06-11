@@ -1,6 +1,6 @@
 import '../scss/styles.scss';
 import * as bootstrap from 'bootstrap';
 
-import validateInput from './validateForm.js';
+import makeInput from './makeInput.js';
 
-validateInput();
+makeInput(document.getElementById('header'));
