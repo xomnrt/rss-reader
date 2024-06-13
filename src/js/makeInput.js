@@ -2,8 +2,10 @@ import i18next from 'i18next';
 import _ from 'lodash';
 import * as yup from 'yup';
 import resources from './locales/index.js';
+import makeRSS from './parserForRSS.js';
 
-// export default function makeInput(anchorElement, onFeedUpdate)
+// makeInput(anchorElement, onFeedUpdate)
+
 function validate(value) {
   const validURL = /^((https?|ftp):\/\/)?(www.)?(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i;
   const schema = yup.string().matches(validURL).required('');
@@ -100,15 +102,13 @@ export default async function makeInput(anchorElement) {
     if (state.status === 'filled') {
       switch (state.error) {
         case 'ok':
-          console.log('state.error');
-
           errorStatement.classList.remove('text-danger');
           errorStatement.classList.add('text-success');
-
           errorStatement.textContent = i18nextInstance.t('success_message');
           break;
 
         case i18nextInstance.t('already_added_url'):
+          input.classList.add('border', 'border-danger');
           errorStatement.classList.add('text-danger');
 
           errorStatement.textContent = i18nextInstance.t('already_added_url');
@@ -116,6 +116,7 @@ export default async function makeInput(anchorElement) {
 
         case i18nextInstance.t('invalid_url'):
           errorStatement.classList.add('text-danger');
+          input.classList.add('border', 'border-danger');
           errorStatement.textContent = i18nextInstance.t('invalid_url');
           break;
 
@@ -134,16 +135,14 @@ export default async function makeInput(anchorElement) {
       if (!state.alreadyUsedRss.includes(valueToCheck)) {
         state.alreadyUsedRss.push(valueToCheck);
         state.error = 'ok';
-        console.log('success!');
+        const feeds = [];
+        makeRSS(valueToCheck, feeds);
       } else {
         state.error = i18nextInstance.t('already_added_url');
-        console.log('already added');
       }
     } else {
       state.error = i18nextInstance.t('invalid_url');
-      console.log('invalid url');
     }
-    console.log(state);
 
     form.reset();
     form.focus();
@@ -152,23 +151,4 @@ export default async function makeInput(anchorElement) {
   });
 
   draw(state);
-
-  // <p3 class="feedback m-0 position-absolute small text-success text-danger"></p3>
-
-  //     el.addEventListener('submit', () => {
-  //       validation().then((res) => {
-  //         if (res.error) {
-  //           currentState.error = res.error;
-  //           draw(currentState);
-  //           return;
-  //         }
-
-  //         currentState.error = undefined;
-  //         currentState.alreadyUsedRss.append(res.input);
-  //         draw(currentState);
-  //       });
-  //     });
-
-  //     anchorElement.append(el);
-  //   }
 }
