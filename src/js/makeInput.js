@@ -118,6 +118,12 @@ export default function makeInput(anchorElement, onValidationSuccess) {
     button.textContent = i18nextInstance.t('add');
     colAuto.append(button);
 
+    function makeInvalid(errorMessage) {
+      input.classList.add('border', 'border-danger');
+      errorStatement.classList.add('text-danger');
+      errorStatement.textContent = i18nextInstance.t(errorMessage);
+    }
+
     if (state.filled) {
       switch (state.error) {
         case 'ok':
@@ -127,28 +133,19 @@ export default function makeInput(anchorElement, onValidationSuccess) {
           break;
 
         case 'already_added_url':
-          input.classList.add('border', 'border-danger');
-          errorStatement.classList.add('text-danger');
-
-          errorStatement.textContent = i18nextInstance.t('already_added_url');
+          makeInvalid('already_added_url');
           break;
 
         case 'invalid_url':
-          errorStatement.classList.add('text-danger');
-          input.classList.add('border', 'border-danger');
-          errorStatement.textContent = i18nextInstance.t('invalid_url');
+          makeInvalid('invalid_url');
           break;
 
         case 'invalid_rss_url':
-          errorStatement.classList.add('text-danger');
-          input.classList.add('border', 'border-danger');
-          errorStatement.textContent = i18nextInstance.t('invalid_rss_url');
+          makeInvalid('invalid_rss_url');
           break;
 
         case 'empty_input':
-          errorStatement.classList.add('text-danger');
-          input.classList.add('border', 'border-danger');
-          errorStatement.textContent = i18nextInstance.t('empty_input');
+          makeInvalid('empty_input');
           break;
 
         default:
