@@ -22,8 +22,6 @@ export function makeRSS(url) {
 
       const items = doc.querySelectorAll('item');
 
-      console.log(doc);
-
       const posts = [...items].map((item) => ({
         id: item.querySelector('guid').textContent,
         postTitle: item.querySelector('title').textContent,
@@ -47,8 +45,6 @@ export function makeFeed(anchorElement, modalDivElement) {
     rssLinks: [],
     feeds: [],
   };
-
-  console.log(state);
 
   modalDivElement.addEventListener('show.bs.modal', (e) => {
     const button = e.relatedTarget;
