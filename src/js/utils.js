@@ -1,13 +1,12 @@
 export function getRSSFeedFromLink(url) {
-  return fetch(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`)
-    .then((response) => {
-      if (response.ok) return response.json();
-      throw new Error('network_error');
-    })
+  return fetch(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`, {
+    signal: AbortSignal.timeout(5000),
+  }).then((response) => {
+    if (response.ok) return response.json();
+    throw new Error('network_error');
+  })
     .then((data) => {
       const doc = new DOMParser().parseFromString(data.contents, 'application/xml');
-      const feedName = doc.querySelector('title').textContent;
-      const feedDescription = doc.querySelector('description').textContent;
 
       const items = doc.querySelectorAll('item');
 
@@ -22,8 +21,8 @@ export function getRSSFeedFromLink(url) {
 
       return {
         feedId: doc.querySelector('link').textContent,
-        feedName,
-        feedDescription,
+        feedName: doc.querySelector('title').textContent,
+        feedDescription: doc.querySelector('description').textContent,
         posts,
       };
     })
