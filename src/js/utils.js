@@ -1,6 +1,6 @@
 export function getRSSFeedFromLink(url) {
   return fetch(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`, {
-    signal: AbortSignal.timeout(5000),
+    signal: AbortSignal.timeout(3000),
   }).then((response) => {
     if (response.ok) return response.json();
     throw new Error('network_error');
