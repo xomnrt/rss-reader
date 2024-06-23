@@ -1,6 +1,5 @@
-import _ from 'lodash';
 import * as yup from 'yup';
-import { makeRSS, clear } from './makeFeed.js';
+import { getRSSFeedFromLink, clear } from './makeFeed.js';
 import i18nextInstance from './i18.js';
 
 function validate(value, alreadyAddedLinks) {
@@ -21,7 +20,7 @@ function validate(value, alreadyAddedLinks) {
     return Promise.resolve({ status: 'already_added_url' });
   }
 
-  return makeRSS(value)
+  return getRSSFeedFromLink(value)
     .then((feed) => ({ status: 'ok', feed }))
     .catch(() => ({ status: 'invalid_rss_url' }));
 }
