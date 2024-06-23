@@ -8,27 +8,30 @@ export function getRSSFeedFromLink(url) {
       throw new Error('network_error');
     })
     .then((data) => {
-      const doc = new DOMParser().parseFromString(data.contents, 'application/xml');
+      try {
+        const doc = new DOMParser().parseFromString(data.contents, 'application/xml');
 
-      const items = doc.querySelectorAll('item');
+        const items = doc.querySelectorAll('item');
 
-      const posts = [...items].map((item) => ({
-        id: item.querySelector('guid').textContent,
-        postTitle: item.querySelector('title').textContent,
-        postDescription: item.querySelector('description').textContent,
-        postLink: item.querySelector('link').textContent,
-        pubDate: new Date(Date.parse(item.querySelector('pubDate').textContent)),
-        seen: false,
-      }));
+        const posts = [...items].map((item) => ({
+          id: item.querySelector('guid').textContent,
+          postTitle: item.querySelector('title').textContent,
+          postDescription: item.querySelector('description').textContent,
+          postLink: item.querySelector('link').textContent,
+          pubDate: new Date(Date.parse(item.querySelector('pubDate').textContent)),
+          seen: false,
+        }));
 
-      return {
-        feedId: doc.querySelector('link').textContent,
-        feedName: doc.querySelector('title').textContent,
-        feedDescription: doc.querySelector('description').textContent,
-        posts,
-      };
-    })
-    .catch(() => { throw new Error('invalid_rss_url'); });
+        return {
+          feedId: doc.querySelector('link').textContent,
+          feedName: doc.querySelector('title').textContent,
+          feedDescription: doc.querySelector('description').textContent,
+          posts,
+        };
+      } catch {
+        throw new Error('invalid_rss_url');
+      }
+    });
 }
 
 export function clear(parentElement) {
