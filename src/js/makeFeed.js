@@ -145,6 +145,26 @@ function fillPostsList(state, cardBorder) {
 }
 
 function fillFeedsList(state, divFeeds) {
+  const feedList = createFeedList(divFeeds);
+
+  state.feeds.forEach((feed) => {
+    const feedLi = document.createElement('li');
+    feedLi.classList.add('list-group-item', 'border-0', 'border-end-0');
+
+    const subscribedFeedTitle = document.createElement('h3');
+    subscribedFeedTitle.classList.add('h6', 'm-0');
+    subscribedFeedTitle.textContent = feed.feedName;
+
+    const subscribedFeedDescription = document.createElement('p');
+    subscribedFeedDescription.classList.add('m-0', 'small', 'text-black-50');
+    subscribedFeedDescription.textContent = feed.feedDescription;
+    feedLi.append(subscribedFeedTitle, subscribedFeedDescription);
+
+    feedList.append(feedLi);
+  });
+}
+
+function createFeedList(divFeeds) {
   divFeeds.classList.add('col-md-10', 'col-lg-4', 'mx-auto', 'order-0', 'order-lg-1', 'feeds');
   const cardBorderFeeds = document.createElement('div');
   cardBorderFeeds.classList.add('card', 'border-0');
@@ -162,22 +182,7 @@ function fillFeedsList(state, divFeeds) {
   const feedList = document.createElement('ul');
   feedList.classList.add('list-group', 'border-0', 'rounded-0');
   cardBorderFeeds.append(feedList);
-
-  state.feeds.forEach((feed) => {
-    const feedLi = document.createElement('li');
-    feedLi.classList.add('list-group-item', 'border-0', 'border-end-0');
-
-    const subscribedFeedTitle = document.createElement('h3');
-    subscribedFeedTitle.classList.add('h6', 'm-0');
-    subscribedFeedTitle.textContent = feed.feedName;
-
-    const subscribedFeedDescription = document.createElement('p');
-    subscribedFeedDescription.classList.add('m-0', 'small', 'text-black-50');
-    subscribedFeedDescription.textContent = feed.feedDescription;
-    feedLi.append(subscribedFeedTitle, subscribedFeedDescription);
-
-    feedList.append(feedLi);
-  });
+  return feedList;
 }
 
 function draw(state, anchorElement) {

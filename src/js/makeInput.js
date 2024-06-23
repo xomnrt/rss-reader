@@ -25,133 +25,144 @@ function validate(value, alreadyAddedLinks) {
     .catch(() => ({ status: 'invalid_rss_url' }));
 }
 
+function draw(state, anchorElement, onValidationSuccess) {
+  clear(anchorElement);
+
+  const { h1, p1, p2 } = createHeaderMessages();
+
+  const [form, input] = createForm(state, onValidationSuccess, anchorElement);
+
+  const errorStatement = document.createElement('p');
+  errorStatement.classList.add('feedback', 'm-0', 'position-absolute', 'small');
+
+  anchorElement.append(h1, p1, form, p2, errorStatement);
+
+  switch (state.error) {
+    case 'ok':
+      errorStatement.classList.remove('text-danger');
+      errorStatement.classList.add('text-success');
+      errorStatement.textContent = i18nextInstance.t('success_message');
+      break;
+
+    case 'already_added_url':
+    case 'invalid_url':
+    case 'invalid_rss_url':
+    case 'empty_input':
+      input.classList.add('border', 'border-danger');
+      errorStatement.classList.add('text-danger');
+      errorStatement.textContent = i18nextInstance.t(state.error);
+      break;
+
+    default:
+      break;
+  }
+}
+
+function createHeaderMessages() {
+  const h1 = document.createElement('h1');
+  h1.textContent = i18nextInstance.t('header');
+  h1.classList.add('display-3', 'mb-0', 'text-white');
+
+  const p1 = document.createElement('p');
+  p1.textContent = i18nextInstance.t('starting_phrase');
+  p1.classList.add('lead', 'text-white');
+
+  const p2 = document.createElement('p');
+  p2.classList.add('mt-2', 'mb-0', 'text-white-50');
+  p2.textContent = i18nextInstance.t('example');
+  return { h1, p1, p2 };
+}
+
+function createFormEventListener(form, state, onValidationSuccess, anchorElement) {
+  return (e) => {
+    e.preventDefault();
+    const button = form.querySelector('button');
+    button.setAttribute('disabled', true);
+    const valueToCheck = form.querySelector('input').value.trim();
+
+    validate(valueToCheck, state.alreadyUsedRss).then((validationResult) => {
+      button.removeAttribute('disabled');
+      state.error = validationResult.status;
+
+      if (validationResult.status === 'ok') {
+        state.alreadyUsedRss.push(valueToCheck);
+        onValidationSuccess(valueToCheck, validationResult.feed);
+      }
+
+      form.reset();
+      form.focus();
+
+      draw(state, anchorElement, onValidationSuccess);
+    });
+  };
+}
+
+function createForm(state, onValidationSuccess, anchorElement) {
+  const form = document.createElement('form');
+  form.setAttribute('action', '');
+  form.classList.add('rss-form', 'text-body');
+  const formEventListener = createFormEventListener(
+    form,
+    state,
+    onValidationSuccess,
+    anchorElement,
+  );
+  form.addEventListener('submit', formEventListener);
+
+  const row = document.createElement('div');
+  row.classList.add('row');
+
+  const col = document.createElement('div');
+  col.classList.add('col');
+  const colAuto = document.createElement('div');
+  colAuto.classList.add('col-auto');
+
+  row.append(col, colAuto);
+
+  const { formFloating, input } = createFormFloating();
+
+  col.append(formFloating);
+
+  const button = document.createElement('button');
+  button.type = 'submit';
+  button['aria-label'] = 'add';
+  button.classList.add('h-100', 'btn', 'btn-lg', 'btn-info', 'px-sm-5', 'text-white');
+  button.textContent = i18nextInstance.t('add');
+  colAuto.append(button);
+
+  form.append(row);
+
+  return [form, input];
+}
+
+function createFormFloating() {
+  const formFloating = document.createElement('div');
+  formFloating.classList.add('form-floating');
+
+  const input = document.createElement('input');
+  input.classList.add('form-control', 'w-100');
+  input.id = 'url-input';
+  input.autofocus = true;
+  input.required = true;
+  input.name = 'url';
+  input['aria-label'] = 'url';
+  input.placeholder = i18nextInstance.t('link');
+  input.autocomplete = 'off';
+  input.removeAttribute('required');
+
+  const label = document.createElement('label');
+  label.setAttribute('for', 'url-input');
+  label.textContent = i18nextInstance.t('link');
+
+  formFloating.append(input, label);
+  return { formFloating, input };
+}
+
 export default function makeInput(anchorElement, onValidationSuccess) {
   const state = {
     alreadyUsedRss: [],
     error: undefined,
-    filled: false,
   };
 
-  function draw(state) {
-    clear(anchorElement);
-
-    const form = document.createElement('form');
-    const input = document.createElement('input');
-    const errorStatement = document.createElement('p');
-
-    const h1 = document.createElement('h1');
-    h1.textContent = i18nextInstance.t('header');
-    h1.classList.add('display-3', 'mb-0', 'text-white');
-
-    const p1 = document.createElement('p');
-    p1.textContent = i18nextInstance.t('starting_phrase');
-    p1.classList.add('lead', 'text-white');
-
-    form.setAttribute('action', '');
-    form.classList.add('rss-form', 'text-body');
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const button = form.querySelector('button');
-      button.setAttribute('disabled', true);
-      const valueToCheck = input.value.trim();
-      state.filled = true;
-
-      validate(valueToCheck, state.alreadyUsedRss).then((validationResult) => {
-        button.removeAttribute('disabled');
-        state.error = validationResult.status;
-
-        if (validationResult.status === 'ok') {
-          state.alreadyUsedRss.push(valueToCheck);
-          onValidationSuccess(valueToCheck, validationResult.feed);
-        }
-
-        form.reset();
-        form.focus();
-
-        draw(state);
-      });
-    });
-
-    const p2 = document.createElement('p');
-    p2.classList.add('mt-2', 'mb-0', 'text-white-50');
-    p2.textContent = i18nextInstance.t('example');
-
-    errorStatement.classList.add('feedback', 'm-0', 'position-absolute', 'small', 'text-danger');
-
-    anchorElement.append(h1, p1, form, p2, errorStatement);
-
-    const row = document.createElement('div');
-    row.classList.add('row');
-    form.append(row);
-
-    const col = document.createElement('div');
-    col.classList.add('col');
-    const colAuto = document.createElement('div');
-    colAuto.classList.add('col-auto');
-
-    row.append(col, colAuto);
-
-    const formFloating = document.createElement('div');
-    formFloating.classList.add('form-floating');
-    col.append(formFloating);
-    input.classList.add('form-control', 'w-100');
-    input.id = 'url-input';
-    input.autofocus = true;
-    input.required = true;
-    input.name = 'url';
-    input['aria-label'] = 'url';
-    input.placeholder = i18nextInstance.t('link');
-    input.autocomplete = 'off';
-    input.removeAttribute('required');
-
-    const label = document.createElement('label');
-    label.setAttribute('for', 'url-input');
-    label.textContent = i18nextInstance.t('link');
-
-    formFloating.append(input, label);
-
-    const button = document.createElement('button');
-    button.type = 'submit';
-    button['aria-label'] = 'add';
-    button.classList.add('h-100', 'btn', 'btn-lg', 'btn-info', 'px-sm-5', 'text-white');
-    button.textContent = i18nextInstance.t('add');
-    colAuto.append(button);
-
-    function makeInvalid(errorMessage) {
-      input.classList.add('border', 'border-danger');
-      errorStatement.classList.add('text-danger');
-      errorStatement.textContent = i18nextInstance.t(errorMessage);
-    }
-
-    if (state.filled) {
-      switch (state.error) {
-        case 'ok':
-          errorStatement.classList.remove('text-danger');
-          errorStatement.classList.add('text-success');
-          errorStatement.textContent = i18nextInstance.t('success_message');
-          break;
-
-        case 'already_added_url':
-          makeInvalid('already_added_url');
-          break;
-
-        case 'invalid_url':
-          makeInvalid('invalid_url');
-          break;
-
-        case 'invalid_rss_url':
-          makeInvalid('invalid_rss_url');
-          break;
-
-        case 'empty_input':
-          makeInvalid('empty_input');
-          break;
-
-        default:
-          break;
-      }
-    }
-  }
-
-  draw(state);
+  draw(state, anchorElement, onValidationSuccess);
 }
