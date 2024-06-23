@@ -1,10 +1,12 @@
 export function getRSSFeedFromLink(url) {
   return fetch(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`, {
     signal: AbortSignal.timeout(3000),
-  }).then((response) => {
-    if (response.ok) return response.json();
-    throw new Error('network_error');
   })
+    .catch(() => { throw new Error('network_error'); })
+    .then((response) => {
+      if (response.ok) return response.json();
+      throw new Error('network_error');
+    })
     .then((data) => {
       const doc = new DOMParser().parseFromString(data.contents, 'application/xml');
 
