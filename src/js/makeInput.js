@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import { getRSSFeedFromLink, clear } from './makeFeed.js';
+import { clear, getRSSFeedFromLink } from './utils.js';
 import i18nextInstance from './i18.js';
 
 function validate(value, alreadyAddedLinks) {
@@ -22,7 +22,7 @@ function validate(value, alreadyAddedLinks) {
 
   return getRSSFeedFromLink(value)
     .then((feed) => ({ status: 'ok', feed }))
-    .catch(() => ({ status: 'invalid_rss_url' }));
+    .catch((e) => { console.log(e); return { status: e.message }; });
 }
 
 function draw(state, anchorElement, onValidationSuccess) {
@@ -48,6 +48,7 @@ function draw(state, anchorElement, onValidationSuccess) {
     case 'invalid_url':
     case 'invalid_rss_url':
     case 'empty_input':
+    case 'network_error':
       form.querySelector('input').classList.add('border', 'border-danger');
       errorStatement.classList.add('text-danger');
       errorStatement.textContent = i18nextInstance.t(state.error);

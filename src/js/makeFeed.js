@@ -1,42 +1,5 @@
+import { getRSSFeedFromLink, clear } from './utils.js';
 import i18nextInstance from './i18.js';
-
-export function clear(parentElement) {
-  while (parentElement.firstChild) {
-    parentElement.removeChild(parentElement.lastChild);
-  }
-}
-
-export function getRSSFeedFromLink(url) {
-  return fetch(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`)
-    .then((response) => {
-      if (response.ok) return response.json();
-      throw new Error('Network response was not ok.');
-    })
-    .then((data) => {
-      const doc = new DOMParser().parseFromString(data.contents, 'application/xml');
-
-      const feedName = doc.querySelector('title').textContent;
-      const feedDescription = doc.querySelector('description').textContent;
-
-      const items = doc.querySelectorAll('item');
-
-      const posts = [...items].map((item) => ({
-        id: item.querySelector('guid').textContent,
-        postTitle: item.querySelector('title').textContent,
-        postDescription: item.querySelector('description').textContent,
-        postLink: item.querySelector('link').textContent,
-        pubDate: new Date(Date.parse(item.querySelector('pubDate').textContent)),
-        seen: false,
-      }));
-
-      return {
-        feedId: doc.querySelector('link').textContent,
-        feedName,
-        feedDescription,
-        posts,
-      };
-    });
-}
 
 function makeModalWindow(modalDivElement, state) {
   modalDivElement.addEventListener('show.bs.modal', (e) => {
