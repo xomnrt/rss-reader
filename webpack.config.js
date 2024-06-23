@@ -1,20 +1,21 @@
-const path = require('path')
-const miniCssExtractPlugin = require('mini-css-extract-plugin')
+const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const autorefixer = require('autoprefixer');
 
 module.exports = {
   mode: 'development',
   entry: './src/js/main.js',
   output: {
     filename: 'main.js',
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve(__dirname, 'dist'),
   },
   devServer: {
     static: path.resolve(__dirname, 'dist'),
     port: 8080,
-    hot: true
+    hot: true,
   },
   plugins: [
-    new miniCssExtractPlugin(),
+    new MiniCssExtractPlugin(),
   ],
   module: {
     rules: [
@@ -22,26 +23,26 @@ module.exports = {
         test: /\.(scss)$/,
         use: [
           {
-            loader: miniCssExtractPlugin.loader,
+            loader: MiniCssExtractPlugin.loader,
           },
           {
-            loader: 'css-loader'
+            loader: 'css-loader',
           },
           {
             loader: 'postcss-loader',
             options: {
               postcssOptions: {
                 plugins: () => [
-                  require('autoprefixer')
-                ]
-              }
-            }
+                  autorefixer,
+                ],
+              },
+            },
           },
           {
-            loader: 'sass-loader'
-          }
-        ]
-      }
-    ]
-  }
-}
+            loader: 'sass-loader',
+          },
+        ],
+      },
+    ],
+  },
+};

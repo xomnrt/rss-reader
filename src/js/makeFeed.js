@@ -15,7 +15,7 @@ function makeModalWindow(modalDivElement, state) {
     const fullArticleLink = modalDivElement.querySelector('.full-article');
 
     state.feeds.forEach((feed) => {
-      const post = feed.posts.find((post) => post.postLink === button.previousElementSibling.href);
+      const post = feed.posts.find((p) => p.postLink === button.previousElementSibling.href);
       if (post !== undefined) {
         post.seen = true;
         modalTitle.textContent = post.postTitle;
@@ -53,38 +53,6 @@ function createLayout(anchorElement) {
   return [divFeeds, cardBorder];
 }
 
-function fillPostsList(state, cardBorder) {
-  const postsList = document.createElement('ul');
-  postsList.classList.add('list-group', 'border-0', 'rounded-0');
-  cardBorder.append(postsList);
-
-  const allPosts = [];
-  state.feeds.forEach((feed) => {
-    allPosts.push(...feed.posts);
-  });
-
-  allPosts.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
-
-  allPosts.forEach((post) => {
-    const newLi = postToListItem(post);
-
-    postsList.append(newLi);
-  });
-
-  postsList.addEventListener('click', (e) => {
-    const activeLink = e.target;
-    state.feeds.forEach((feed) => {
-      feed.posts.forEach((post) => {
-        if (post.postLink === activeLink.href) {
-          post.seen = true;
-        }
-      });
-    });
-    activeLink.classList.remove('fw-bold');
-    activeLink.classList.add('fw-normal');
-  });
-}
-
 function postToListItem(post) {
   const newLi = document.createElement('li');
   newLi.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
@@ -110,23 +78,36 @@ function postToListItem(post) {
   return newLi;
 }
 
-function fillFeedsList(state, divFeeds) {
-  const feedList = createFeedList(divFeeds);
+function fillPostsList(state, cardBorder) {
+  const postsList = document.createElement('ul');
+  postsList.classList.add('list-group', 'border-0', 'rounded-0');
+  cardBorder.append(postsList);
 
+  const allPosts = [];
   state.feeds.forEach((feed) => {
-    const feedLi = document.createElement('li');
-    feedLi.classList.add('list-group-item', 'border-0', 'border-end-0');
+    allPosts.push(...feed.posts);
+  });
 
-    const subscribedFeedTitle = document.createElement('h3');
-    subscribedFeedTitle.classList.add('h6', 'm-0');
-    subscribedFeedTitle.textContent = feed.feedName;
+  allPosts.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
 
-    const subscribedFeedDescription = document.createElement('p');
-    subscribedFeedDescription.classList.add('m-0', 'small', 'text-black-50');
-    subscribedFeedDescription.textContent = feed.feedDescription;
-    feedLi.append(subscribedFeedTitle, subscribedFeedDescription);
+  allPosts.forEach((post) => {
+    const newLi = postToListItem(post);
 
-    feedList.append(feedLi);
+    postsList.append(newLi);
+  });
+
+  postsList.addEventListener('click', (e) => {
+    const activeLink = e.target;
+    state.feeds.forEach((feed) => {
+      feed.posts.forEach((p) => {
+        const post = p;
+        if (post.postLink === activeLink.href) {
+          post.seen = true;
+        }
+      });
+    });
+    activeLink.classList.remove('fw-bold');
+    activeLink.classList.add('fw-normal');
   });
 }
 
@@ -151,6 +132,26 @@ function createFeedList(divFeeds) {
   return feedList;
 }
 
+function fillFeedsList(state, divFeeds) {
+  const feedList = createFeedList(divFeeds);
+
+  state.feeds.forEach((feed) => {
+    const feedLi = document.createElement('li');
+    feedLi.classList.add('list-group-item', 'border-0', 'border-end-0');
+
+    const subscribedFeedTitle = document.createElement('h3');
+    subscribedFeedTitle.classList.add('h6', 'm-0');
+    subscribedFeedTitle.textContent = feed.feedName;
+
+    const subscribedFeedDescription = document.createElement('p');
+    subscribedFeedDescription.classList.add('m-0', 'small', 'text-black-50');
+    subscribedFeedDescription.textContent = feed.feedDescription;
+    feedLi.append(subscribedFeedTitle, subscribedFeedDescription);
+
+    feedList.append(feedLi);
+  });
+}
+
 function draw(state, anchorElement) {
   if (state.feeds.length === 0) {
     return;
@@ -168,7 +169,7 @@ function startUpdatePostsRoutine(state, anchorElement) {
 
   Promise.all(updatedFeedsPromises).then((updatedFeeds) => {
     state.feeds.forEach((feed) => {
-      const updatedFeed = updatedFeeds.find((updatedFeed) => updatedFeed.feedId === feed.feedId);
+      const updatedFeed = updatedFeeds.find((uf) => uf.feedId === feed.feedId);
       if (updatedFeed === undefined) {
         return;
       }
@@ -188,7 +189,7 @@ function startUpdatePostsRoutine(state, anchorElement) {
   });
 }
 
-export function makeFeed(anchorElement, modalDivElement) {
+export default function makeFeed(anchorElement, modalDivElement) {
   const state = {
     rssLinks: [],
     feeds: [],
