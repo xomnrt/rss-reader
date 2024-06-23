@@ -30,7 +30,7 @@ function draw(state, anchorElement, onValidationSuccess) {
 
   const { h1, p1, p2 } = createHeaderMessages();
 
-  const [form, input] = createForm(state, onValidationSuccess, anchorElement);
+  const form = createForm(state, onValidationSuccess, anchorElement);
 
   const errorStatement = document.createElement('p');
   errorStatement.classList.add('feedback', 'm-0', 'position-absolute', 'small');
@@ -48,7 +48,7 @@ function draw(state, anchorElement, onValidationSuccess) {
     case 'invalid_url':
     case 'invalid_rss_url':
     case 'empty_input':
-      input.classList.add('border', 'border-danger');
+      form.querySelector('input').classList.add('border', 'border-danger');
       errorStatement.classList.add('text-danger');
       errorStatement.textContent = i18nextInstance.t(state.error);
       break;
@@ -73,9 +73,10 @@ function createHeaderMessages() {
   return { h1, p1, p2 };
 }
 
-function createFormEventListener(form, state, onValidationSuccess, anchorElement) {
+function createFormEventListener(state, onValidationSuccess, anchorElement) {
   return (e) => {
     e.preventDefault();
+    const form = e.target;
     const button = form.querySelector('button');
     button.setAttribute('disabled', true);
     const valueToCheck = form.querySelector('input').value.trim();
@@ -83,15 +84,12 @@ function createFormEventListener(form, state, onValidationSuccess, anchorElement
     validate(valueToCheck, state.alreadyUsedRss).then((validationResult) => {
       button.removeAttribute('disabled');
       state.error = validationResult.status;
-
       if (validationResult.status === 'ok') {
         state.alreadyUsedRss.push(valueToCheck);
         onValidationSuccess(valueToCheck, validationResult.feed);
       }
-
       form.reset();
       form.focus();
-
       draw(state, anchorElement, onValidationSuccess);
     });
   };
@@ -101,27 +99,17 @@ function createForm(state, onValidationSuccess, anchorElement) {
   const form = document.createElement('form');
   form.setAttribute('action', '');
   form.classList.add('rss-form', 'text-body');
-  const formEventListener = createFormEventListener(
-    form,
-    state,
-    onValidationSuccess,
-    anchorElement,
-  );
-  form.addEventListener('submit', formEventListener);
+  form.addEventListener('submit', createFormEventListener(state, onValidationSuccess, anchorElement));
 
   const row = document.createElement('div');
   row.classList.add('row');
 
   const col = document.createElement('div');
   col.classList.add('col');
+  col.append(createFormFloating());
+
   const colAuto = document.createElement('div');
   colAuto.classList.add('col-auto');
-
-  row.append(col, colAuto);
-
-  const { formFloating, input } = createFormFloating();
-
-  col.append(formFloating);
 
   const button = document.createElement('button');
   button.type = 'submit';
@@ -130,9 +118,11 @@ function createForm(state, onValidationSuccess, anchorElement) {
   button.textContent = i18nextInstance.t('add');
   colAuto.append(button);
 
+  row.append(col, colAuto);
+
   form.append(row);
 
-  return [form, input];
+  return form;
 }
 
 function createFormFloating() {
@@ -155,7 +145,7 @@ function createFormFloating() {
   label.textContent = i18nextInstance.t('link');
 
   formFloating.append(input, label);
-  return { formFloating, input };
+  return formFloating;
 }
 
 export default function makeInput(anchorElement, onValidationSuccess) {

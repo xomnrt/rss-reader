@@ -101,31 +101,7 @@ function fillPostsList(state, cardBorder) {
   allPosts.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
 
   allPosts.forEach((post) => {
-    const newLi = document.createElement('li');
-    newLi.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
-
-    const a = document.createElement('a');
-    a.href = post.postLink;
-    if (post.seen) {
-      a.classList.add('fw-normal');
-    } else {
-      a.classList.add('fw-bold');
-    }
-    a.dataset.id = '2';
-    a.target = '_blank';
-    a.rel = 'noopener norefferer';
-    a.textContent = post.postTitle;
-
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.classList.add('btn', 'btn-outline-primary', 'btn-sm', 'viewButton');
-    button.dataset.id = '2';
-    button.dataset.bsToggle = 'modal';
-    button.dataset.bsTarget = '#modal';
-    button.textContent = i18nextInstance.t('view');
-    button.id = post.id;
-
-    newLi.append(a, button);
+    const newLi = postToListItem(post);
 
     postsList.append(newLi);
   });
@@ -142,6 +118,31 @@ function fillPostsList(state, cardBorder) {
     activeLink.classList.remove('fw-bold');
     activeLink.classList.add('fw-normal');
   });
+}
+
+function postToListItem(post) {
+  const newLi = document.createElement('li');
+  newLi.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
+
+  const a = document.createElement('a');
+  a.href = post.postLink;
+  a.classList.add(post.seen ? 'fw-normal' : 'fw-bold');
+  a.dataset.id = '2';
+  a.target = '_blank';
+  a.rel = 'noopener norefferer';
+  a.textContent = post.postTitle;
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.classList.add('btn', 'btn-outline-primary', 'btn-sm', 'viewButton');
+  button.dataset.id = '2';
+  button.dataset.bsToggle = 'modal';
+  button.dataset.bsTarget = '#modal';
+  button.textContent = i18nextInstance.t('view');
+  button.id = post.id;
+
+  newLi.append(a, button);
+  return newLi;
 }
 
 function fillFeedsList(state, divFeeds) {
