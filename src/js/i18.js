@@ -3,6 +3,6 @@ import resources from './locales/index.js';
 
 export default i18next.createInstance({
   lng: 'ru',
-  debug: true,
+  debug: false,
   resources,
 }, () => {});

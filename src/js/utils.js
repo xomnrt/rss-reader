@@ -1,7 +1,5 @@
 export function getRSSFeedFromLink(url) {
-  return fetch(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`, {
-    signal: AbortSignal.timeout(3000),
-  })
+  return fetch(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`)
     .catch(() => { throw new Error('network_error'); })
     .then((response) => {
       if (response.ok) return response.json();
@@ -14,7 +12,6 @@ export function getRSSFeedFromLink(url) {
         const items = doc.querySelectorAll('item');
 
         const posts = [...items].map((item) => ({
-          id: item.querySelector('guid').textContent,
           postTitle: item.querySelector('title').textContent,
           postDescription: item.querySelector('description').textContent,
           postLink: item.querySelector('link').textContent,

@@ -22,7 +22,7 @@ function validate(value, alreadyAddedLinks) {
 
   return getRSSFeedFromLink(value)
     .then((feed) => ({ status: 'ok', feed }))
-    .catch((e) => { console.log(e); return { status: e.message }; });
+    .catch((e) => ({ status: e.message }));
 }
 
 function draw(state, anchorElement, onValidationSuccess) {

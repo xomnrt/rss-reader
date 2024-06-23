@@ -1,6 +1,8 @@
 import { getRSSFeedFromLink, clear } from './utils.js';
 import i18nextInstance from './i18.js';
 
+// https://ru.hexlet.io/lessons.rss
+
 function makeModalWindow(modalDivElement, state) {
   modalDivElement.addEventListener('show.bs.modal', (e) => {
     const button = e.relatedTarget;
@@ -13,7 +15,7 @@ function makeModalWindow(modalDivElement, state) {
     const fullArticleLink = modalDivElement.querySelector('.full-article');
 
     state.feeds.forEach((feed) => {
-      const post = feed.posts.find((post) => post.id === button.previousElementSibling.href);
+      const post = feed.posts.find((post) => post.postLink === button.previousElementSibling.href);
       if (post !== undefined) {
         post.seen = true;
         modalTitle.textContent = post.postTitle;
@@ -73,7 +75,7 @@ function fillPostsList(state, cardBorder) {
     const activeLink = e.target;
     state.feeds.forEach((feed) => {
       feed.posts.forEach((post) => {
-        if (post.id === activeLink.href) {
+        if (post.postLink === activeLink.href) {
           post.seen = true;
         }
       });
@@ -102,7 +104,7 @@ function postToListItem(post) {
   button.dataset.bsToggle = 'modal';
   button.dataset.bsTarget = '#modal';
   button.textContent = i18nextInstance.t('view');
-  button.id = post.id;
+  button.id = post.postLink;
 
   newLi.append(a, button);
   return newLi;
@@ -172,7 +174,7 @@ function startUpdatePostsRoutine(state, anchorElement) {
       }
 
       updatedFeed.posts.forEach((updatedPost) => {
-        const postFromState = feed.posts.find((post) => post.id === updatedPost.id);
+        const postFromState = feed.posts.find((post) => post.postLink === updatedPost.postLink);
 
         if (postFromState === undefined) {
           feed.posts.push(updatedPost);
