@@ -135,7 +135,7 @@ function createFormFloating() {
   input.autofocus = true;
   input.required = true;
   input.name = 'url';
-  input['aria-label'] = 'url';
+  input.setAttribute('aria-label', 'url');
   input.placeholder = i18nextInstance.t('link');
   input.autocomplete = 'off';
   input.removeAttribute('required');
