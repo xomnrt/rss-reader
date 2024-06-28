@@ -1,4 +1,4 @@
-import '../scss/styles.scss';
+import './scss/styles.scss';
 // eslint-disable-next-line no-unused-vars
 import * as bootstrap from 'bootstrap';
 
@@ -26,7 +26,7 @@ function addPosts(newPosts, _watchedState) {
   watchedState.posts = oldPosts;
 }
 
-function main() {
+export default function main() {
   const i18nextInstance = i18next.createInstance({
     lng: 'ru',
     debug: false,
@@ -191,10 +191,6 @@ function main() {
       }
     }
   });
-  // навесить на стейт онченжж
-  // на изменение по разным патсх реагировать по разному
-
-  // навесить лисенеры на инпут и переход по ссылкам и модальные тыки
 
   input.addEventListener('change', () => {
     watchedState.form.value = input.value;
@@ -249,5 +245,3 @@ function main() {
 
   updateFeedsRoutine();
 }
-
-main();
