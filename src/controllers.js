@@ -86,7 +86,9 @@ function createControllerForInput(input, _watchedState) {
   });
 }
 
-export function createController(watchedState, input, form, modal, postList) {
+export function createController(watchedState, {
+  input, form, modal, postList,
+}) {
   createControllerForInput(input, watchedState);
   createControllerForForm(form, watchedState);
   createControllerForLinks(postList, watchedState);

@@ -13,18 +13,16 @@ export function getRSSFeedFromLink(url) {
 
         const items = doc.querySelectorAll('item');
 
-        const posts = [...items].map((item) => ({
-          postTitle: item.querySelector('title').textContent,
-          postDescription: item.querySelector('description').textContent,
-          postLink: item.querySelector('link').textContent,
-          pubDate: new Date(Date.parse(item.querySelector('pubDate').textContent)),
-        }));
-
         return {
           feedLink: url,
           feedName: doc.querySelector('title').textContent,
           feedDescription: doc.querySelector('description').textContent,
-          posts,
+          posts: [...items].map((item) => ({
+            postTitle: item.querySelector('title').textContent,
+            postDescription: item.querySelector('description').textContent,
+            postLink: item.querySelector('link').textContent,
+            pubDate: new Date(Date.parse(item.querySelector('pubDate').textContent)),
+          })),
         };
       } catch {
         throw new Error('invalid_rss_url');

@@ -80,7 +80,9 @@ export default function main() {
     }
   });
 
-  createController(watchedState, input, form, modal, postList);
+  createController(watchedState, {
+    input, form, modal, postList,
+  });
 
   updateFeedsRoutine(watchedState);
 }
