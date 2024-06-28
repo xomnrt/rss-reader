@@ -4,9 +4,9 @@ const autorefixer = require('autoprefixer');
 
 module.exports = {
   mode: 'development',
-  entry: './src/app.js',
+  entry: './src/index.js',
   output: {
-    filename: 'main.js',
+    filename: 'index.js',
     path: path.resolve(__dirname, 'dist'),
   },
   devServer: {
