@@ -1,4 +1,44 @@
-import { validate } from './utils.js';
+import * as yup from 'yup';
+
+export function getRSSFeedFromLink(url) {
+  return fetch(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`)
+    .catch(() => { throw new Error('network_error'); })
+    .then((response) => {
+      if (response.ok) return response.json();
+      throw new Error('network_error');
+    })
+    .then((data) => {
+      try {
+        const doc = new DOMParser().parseFromString(data.contents, 'application/xml');
+
+        const items = doc.querySelectorAll('item');
+
+        return {
+          feedLink: url,
+          feedName: doc.querySelector('title').textContent,
+          feedDescription: doc.querySelector('description').textContent,
+          posts: [...items].map((item) => ({
+            postTitle: item.querySelector('title').textContent,
+            postDescription: item.querySelector('description').textContent,
+            postLink: item.querySelector('link').textContent,
+            pubDate: new Date(Date.parse(item.querySelector('pubDate').textContent)),
+          })),
+        };
+      } catch {
+        throw new Error('invalid_rss_url');
+      }
+    });
+}
+
+export function validate(value, alreadyAddedLinks) {
+  const schema = yup.string().trim().url('invalid_url').required('empty_input')
+    .notOneOf([...alreadyAddedLinks], 'already_added_url');
+
+  return schema.validate(value)
+    .then(getRSSFeedFromLink)
+    .then((feed) => ({ status: 'success_message', feed }))
+    .catch((e) => ({ status: e.message }));
+}
 
 export function addPosts(newPosts, _watchedState) {
   const watchedState = _watchedState;
@@ -86,6 +126,24 @@ function createControllerForInput(input, _watchedState) {
   });
 }
 
+function updateFeedsRoutine(watchedState) {
+  const updatedFeedsPromises = watchedState
+    .feeds.map((feed) => getRSSFeedFromLink(feed.feedLink));
+
+  Promise.all(updatedFeedsPromises).then((updatedFeeds) => {
+    const posts = [];
+    updatedFeeds.forEach((feed) => {
+      posts.push(...feed.posts);
+    });
+
+    addPosts(posts, watchedState);
+  })
+    .catch((e) => console.log(e))
+    .finally(() => {
+      setTimeout(() => updateFeedsRoutine(watchedState), 5000);
+    });
+}
+
 export function createController(watchedState, {
   input, form, modal, postList,
 }) {
@@ -93,4 +151,5 @@ export function createController(watchedState, {
   createControllerForForm(form, watchedState);
   createControllerForLinks(postList, watchedState);
   createControllerForModalWindow(modal, watchedState);
+  updateFeedsRoutine(watchedState);
 }

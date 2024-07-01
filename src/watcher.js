@@ -1,11 +1,17 @@
-import { clear } from './utils';
+import onChange from 'on-change';
 
-export function renderForm(_input, value) {
+function clear(parentElement) {
+  while (parentElement.firstChild) {
+    parentElement.removeChild(parentElement.lastChild);
+  }
+}
+
+function renderForm(_input, value) {
   const input = _input;
   input.value = value;
 }
 
-export function renderFeedback(_feedback, i18nextInstance, value, form) {
+function renderFeedback(_feedback, i18nextInstance, value, form) {
   const feedback = _feedback;
   feedback.textContent = i18nextInstance.t(value);
 
@@ -29,7 +35,7 @@ export function renderFeedback(_feedback, i18nextInstance, value, form) {
   }
 }
 
-export function renderBlockedElement(value, sendButton) {
+function renderBlockedElement(value, sendButton) {
   if (value) {
     sendButton.setAttribute('disabled', true);
   } else {
@@ -37,7 +43,7 @@ export function renderBlockedElement(value, sendButton) {
   }
 }
 
-export function renderFeeds(feedList, i18nextInstance, value) {
+function renderFeeds(feedList, i18nextInstance, value) {
   clear(feedList);
   const cardBody = document.createElement('div');
   cardBody.classList.add('card-body');
@@ -64,7 +70,7 @@ export function renderFeeds(feedList, i18nextInstance, value) {
   feedList.append(ul);
 }
 
-export function renderModal(modal, watchedState, value) {
+function renderModal(modal, watchedState, value) {
   const modalTitle = modal.querySelector('.modal-title');
   const modalDescription = modal.querySelector('.modal-body');
   const fullArticleLink = modal.querySelector('.full-article');
@@ -77,7 +83,7 @@ export function renderModal(modal, watchedState, value) {
   }
 }
 
-export function createLi(post, watchedState, i18nextInstance, ul) {
+function createLi(post, watchedState, i18nextInstance, ul) {
   const li = document.createElement('li');
   li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
 
@@ -103,7 +109,7 @@ export function createLi(post, watchedState, i18nextInstance, ul) {
   ul.append(li);
 }
 
-export function createPostsContent(postList, i18nextInstance, watchedState) {
+function createPostsContent(postList, i18nextInstance, watchedState) {
   if (watchedState.posts.length === 0) return;
 
   clear(postList);
@@ -126,4 +132,29 @@ export function createPostsContent(postList, i18nextInstance, watchedState) {
   });
 
   postList.append(ul);
+}
+
+export default function watch(state, i18nextInstance, {
+  input, feedback, form, sendButton, feedList, postList, modal,
+}) {
+  return onChange(state, (path, value) => {
+    switch (path) {
+      case 'form.value':
+        return renderForm(input, value);
+      case 'form.feedback':
+        return renderFeedback(feedback, i18nextInstance, value, form);
+      case 'form.blocked':
+        return renderBlockedElement(value, sendButton);
+      case 'feeds':
+        return renderFeeds(feedList, i18nextInstance, value);
+      case 'posts':
+      case 'ui.seenPosts':
+        return createPostsContent(postList, i18nextInstance, state);
+      case 'modal.postId':
+        return renderModal(modal, state, value);
+
+      default:
+        throw new Error(`unknown path! ${path}`);
+    }
+  });
 }
